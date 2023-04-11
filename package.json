@@ -1,0 +1,19 @@
+{
+  "name": "express-mesto-gha",
+  "version": "1.0.0",
+  "description": "[![Tests](../../actions/workflows/tests-13-sprint.yml/badge.svg)](../../actions/workflows/tests-13-sprint.yml) [![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)\r # Проект Mesto фронтенд + бэкенд",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Argayash1/express-mesto-gha.git"
+  },
+  "author": "Yakov Zilberman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Argayash1/express-mesto-gha/issues"
+  },
+  "homepage": "https://github.com/Argayash1/express-mesto-gha#readme"
+}
