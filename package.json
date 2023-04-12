@@ -4,7 +4,8 @@
   "description": "[![Tests](../../actions/workflows/tests-13-sprint.yml/badge.svg)](../../actions/workflows/tests-13-sprint.yml) [![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)\r # Проект Mesto фронтенд + бэкенд",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx eslint ."
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/Argayash1/express-mesto-gha/issues"
   },
-  "homepage": "https://github.com/Argayash1/express-mesto-gha#readme"
+  "homepage": "https://github.com/Argayash1/express-mesto-gha#readme",
+  "devDependencies": {
+    "eslint": "^8.38.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5"
+  }
 }
