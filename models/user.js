@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     maxlength: 30, // а максимальная — 30 символов
   },
   avatar: {
-    type: String, // информация о себе — это строка
+    type: String, // ссылка — это строка
     required: true,
   },
 });
