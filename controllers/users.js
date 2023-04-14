@@ -22,5 +22,5 @@ module.exports.createUser = (req, res) => {
     // вернём записанные в базу данные
     .then((user) => res.status(200).send({ data: user }))
     // данные не записались, вернём ошибку
-    .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => res.status(600).send({ message: 'Произошла ошибка' }));
 };
