@@ -14,13 +14,13 @@ module.exports.getUserById = (req, res) => {
     .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
+// Функция, которая создаёт пользователя
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  console.log(name);
 
   User.create({ name, about, avatar })
     // вернём записанные в базу данные
     .then((user) => res.status(200).send({ data: user }))
     // данные не записались, вернём ошибку
-    .catch((err) => res.status(600).send({ message: 'Произошла ошибка' }));
+    .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
 };

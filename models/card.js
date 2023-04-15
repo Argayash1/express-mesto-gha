@@ -20,7 +20,7 @@ const cardSchema = new mongoose.Schema({
   },
   likes: {
     // у карточки есть ссылка на модель автора карточки — опишем требования к ссылке в схеме:
-    type: mongoose.Schema.Types.ObjectId, // информация о себе — это строка
+    type: [mongoose.Schema.Types.ObjectId], // информация о себе — это строка
     required: true,
     default: [],
   },
