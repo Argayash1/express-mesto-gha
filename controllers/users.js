@@ -29,11 +29,11 @@ module.exports.createUser = (req, res) => {
 
 // Функция, которая обновляет профиль пользователя
 module.exports.updateProfile = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const { name, about } = req.body;
   // обновим имя найденного по _id пользователя
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about, avatar }, // Передадим объект опций:
+    { name, about }, // Передадим объект опций:
     {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением

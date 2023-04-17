@@ -25,8 +25,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', users); // запускаем
-app.use('/', cards); // запускаем
+app.use('/users', users); // запускаем
+app.use('/cards', cards); // запускаем
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает

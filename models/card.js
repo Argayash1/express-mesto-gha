@@ -23,12 +23,10 @@ const cardSchema = new mongoose.Schema({
     // у карточки есть ссылка на модель автора карточки — опишем требования к ссылке в схеме:
     type: [mongoose.Schema.Types.ObjectId], // информация о себе — это строка
     ref: 'user',
-    required: true,
     default: [],
   },
   createdAt: {
     type: Date,
-    required: true,
     default: Date.now,
   },
 });
