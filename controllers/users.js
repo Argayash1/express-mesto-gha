@@ -9,7 +9,8 @@ module.exports.getUsers = (req, res) => {
 
 // Функция, которая возвращает пользователя по _id
 module.exports.getUserById = (req, res) => {
-  User.findById(req.params.userId)
+  const { userId } = req.params;
+  User.findById(userId)
     .then((user) => {
       res.status(200).send(user);
     })
@@ -24,20 +25,23 @@ module.exports.createUser = (req, res) => {
     // вернём записанные в базу данные
     .then((user) => res.status(200).send(user))
     // данные не записались, вернём ошибку
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}` }));
+    .catch((err) => {
+      console.log(err);
+      res.status(500).send({ message: `Произошла ошибка ${err}` });
+    });
 };
 
 // Функция, которая обновляет профиль пользователя
 module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body;
+  const { _id: userId } = req.user;
   // обновим имя найденного по _id пользователя
   User.findByIdAndUpdate(
-    req.user._id,
+    userId,
     { name, about }, // Передадим объект опций:
     {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
-      upsert: true, // если пользователь не найден, он будет создан
     },
   )
     .then((user) => res.send(user))
@@ -47,14 +51,14 @@ module.exports.updateProfile = (req, res) => {
 // Функция, которая обновляет аватар из профиля пользователя
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
+  const { _id: userId } = req.user;
   // обновим имя найденного по _id пользователя
   User.findByIdAndUpdate(
-    req.user._id,
+    userId,
     { avatar }, // Передадим объект опций:
     {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
-      upsert: true, // если пользователь не найден, он будет создан
     },
   )
     .then((user) => res.send(user))

@@ -3,6 +3,7 @@ const Card = require('../models/card');
 // Функция, которая возвращает все карточки
 module.exports.getCards = (req, res) => {
   Card.find({})
+    .populate(['owner', 'likes'])
     .then((cards) => res.status(200).send(cards))
     .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}` }));
 };
@@ -10,8 +11,9 @@ module.exports.getCards = (req, res) => {
 // Функция, которая создаёт карточку
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
+  const { _id: userId } = req.user;
 
-  Card.create({ name, link, owner: req.user._id })
+  Card.create({ name, link, owner: userId })
     .then((card) => card.populate('owner'))
     // вернём записанные в базу данные
     .then((card) => res.status(200).send(card))
@@ -21,14 +23,16 @@ module.exports.createCard = (req, res) => {
 
 // Функция, которая удаляет карточку по идентификатору
 module.exports.deleteCardById = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  const { cardId } = req.params;
+  Card.findByIdAndRemove(cardId)
     .then((card) => res.send(card))
     .catch((err) => res.status(500).send({ message: `Произошла ошибка ${err}` }));
 };
 
 module.exports.likeCard = (req, res) => {
+  const { cardId } = req.params;
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
@@ -38,8 +42,9 @@ module.exports.likeCard = (req, res) => {
 };
 
 module.exports.dislikeCard = (req, res) => {
+  const { cardId } = req.params;
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
