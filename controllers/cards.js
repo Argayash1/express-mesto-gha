@@ -37,7 +37,7 @@ const createCard = (req, res) => {
           .map((error) => error.message)
           .join(' ');
         res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: `Переданы некорректные данные при создании карточки. ${errorMessage}`,
+          message: `Переданы некорректные данные при создании карточки: ${errorMessage}`,
         });
       } else {
         res

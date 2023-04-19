@@ -61,7 +61,7 @@ const createUser = (req, res) => {
           .map((error) => error.message)
           .join(' ');
         res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: `Переданы некорректные данные при создании пользователя. ${errorMessage}`,
+          message: `Переданы некорректные данные при создании пользователя: ${errorMessage}`,
         });
       } else {
         res
@@ -96,9 +96,9 @@ const updateProfile = (req, res) => {
       if (err instanceof ValidationError) {
         const errorMessage = Object.values(err.errors)
           .map((error) => error.message)
-          .join(' ');
+          .join(', ');
         res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: `Переданы некорректные данные при обновлении профиля. ${errorMessage}`,
+          message: `Переданы некорректные данные при обновлении профиля: ${errorMessage}`,
         });
         return;
       }
@@ -141,7 +141,7 @@ const updateAvatar = (req, res) => {
           .map((error) => error.message)
           .join(' ');
         res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: `Переданы некорректные данные при обновлении аватара. ${errorMessage}`,
+          message: `Переданы некорректные данные при обновлении аватара: ${errorMessage}`,
         });
         return;
       }
