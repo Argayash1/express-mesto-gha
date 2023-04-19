@@ -17,4 +17,4 @@ router.put('/:cardId/likes', likeCard);
 
 router.delete('/:cardId/likes', dislikeCard);
 
-module.exports = router; // экспортировали роутер
+module.exports = router; // экспортировали этот роутер

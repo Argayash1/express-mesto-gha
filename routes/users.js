@@ -18,4 +18,4 @@ router.patch('/me', updateProfile);
 
 router.patch('/me/avatar', updateAvatar);
 
-module.exports = router; // экспортировали роутер
+module.exports = router; // экспортировали этот роутер
