@@ -22,7 +22,9 @@ const getUsers = (req, res) => {
 
 // Функция, которая возвращает пользователя по _id
 const getUserById = (req, res) => {
+  console.log(req.params);
   const { userId } = req.params;
+
   User.findById(userId)
     .orFail()
     .then((user) => {
