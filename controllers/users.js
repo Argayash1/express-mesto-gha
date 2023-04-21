@@ -73,14 +73,13 @@ const createUser = (req, res) => {
     });
 };
 
-// Функция, которая обновляет профиль пользователя
-const updateProfile = (req, res) => {
-  const { name, about } = req.body;
+// Функция-декоратор, которая обновляет данные пользователя
+const updateUserData = (req, res, updateOptions) => {
   const { _id: userId } = req.user;
   // обновим имя найденного по _id пользователя
   User.findByIdAndUpdate(
     userId,
-    { name, about }, // Передадим объект опций:
+    updateOptions, // Передадим объект опций:
     {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
@@ -116,47 +115,16 @@ const updateProfile = (req, res) => {
     });
 };
 
-// Функция, которая обновляет аватар из профиля пользователя
+// Функция-декоратор, которая обновляет профиль пользователя
+const updateProfile = (req, res) => {
+  const updateOptions = req.body;
+  updateUserData(req, res, updateOptions);
+};
+
+// Функция-декоратор, которая обновляет аватар пользователя
 const updateAvatar = (req, res) => {
-  const { avatar } = req.body;
-  const { _id: userId } = req.user;
-  // обновим имя найденного по _id пользователя
-  User.findByIdAndUpdate(
-    userId,
-    { avatar }, // Передадим объект опций:
-    {
-      new: true, // обработчик then получит на вход обновлённую запись
-      runValidators: true, // данные будут валидированы перед изменением
-    },
-  )
-    .orFail()
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND_ERROR_CODE).send({
-          message: 'Пользователь по указанному _id не найден',
-        });
-        return;
-      }
-      if (err instanceof ValidationError) {
-        const errorMessage = Object.values(err.errors)
-          .map((error) => error.message)
-          .join(' ');
-        res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: `Переданы некорректные данные при обновлении аватара: ${errorMessage}`,
-        });
-        return;
-      }
-      if (err instanceof CastError) {
-        res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: 'Передан некорректный ID пользователя' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR_CODE)
-          .send({ message: `Произошла ошибка: ${err.name} ${err.message}` });
-      }
-    });
+  const updateOptions = req.body;
+  updateUserData(req, res, updateOptions);
 };
 
 module.exports = {

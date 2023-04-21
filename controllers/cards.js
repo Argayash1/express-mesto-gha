@@ -72,15 +72,10 @@ const deleteCardById = (req, res) => {
     });
 };
 
-// Функция посатановки лайка карточки
-const likeCard = (req, res) => {
+// Функция изменения статуса лайка карточки
+const changeLikeCardStatus = (req, res, likeOtpions) => {
   const { cardId } = req.params;
-  const { _id: userId } = req.user;
-  Card.findByIdAndUpdate(
-    cardId,
-    { $addToSet: { likes: userId } }, // добавить _id пользователя в массив, если его там нет
-    { new: true },
-  )
+  Card.findByIdAndUpdate(cardId, likeOtpions, { new: true })
     .orFail()
     .then((card) => card.populate(['owner', 'likes']))
     .then((card) => res.send(card))
@@ -103,35 +98,19 @@ const likeCard = (req, res) => {
     });
 };
 
-// Функция снятия лайка карточки
-const dislikeCard = (req, res) => {
-  const { cardId } = req.params;
+// Функция-декоратор постановки лайка карточки
+const likeCard = (req, res) => {
   const { _id: userId } = req.user;
-  Card.findByIdAndUpdate(
-    cardId,
-    { $pull: { likes: userId } }, // убрать _id пользователя из массива
-    { new: true },
-  )
-    .orFail()
-    .then((card) => card.populate(['owner', 'likes']))
-    .then((card) => res.send(card))
-    .catch((err) => {
-      if (err instanceof CastError) {
-        res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: 'Переданы некорректные данные для постановки/снятии лайка' });
-        return;
-      }
-      if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND_ERROR_CODE).send({
-          message: 'Передан несуществующий _id карточки',
-        });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR_CODE)
-          .send({ message: `Произошла ошибка: ${err.name} ${err.message}` });
-      }
-    });
+  // добавить _id пользователя в массив, если его там нет
+  const likeOptions = { $addToSet: { likes: userId } };
+  changeLikeCardStatus(req, res, likeOptions);
+};
+
+// Функция-декоратор снятия лайка карточки
+const dislikeCard = (req, res) => {
+  const { _id: userId } = req.user;
+  const likeOptions = { $pull: { likes: userId } }; // убрать _id пользователя из массива
+  changeLikeCardStatus(req, res, likeOptions);
 };
 
 module.exports = {
