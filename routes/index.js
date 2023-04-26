@@ -5,11 +5,13 @@ const { NOT_FOUND_ERROR_CODE } = require('../utils/constants');
 
 const users = require('./users'); // импортируем роутер users.js
 const cards = require('./cards'); // импортируем роутер cards.js
+const { createUser, login } = require('../controllers/users');
 
 // роуты, не требующие авторизации - регистрация и логин
-router.use('/', users);
+router.post('/signup', createUser);
+router.post('/signin', login);
 
-// // авторизация
+// авторизация
 // router.use(auth);
 
 // роуты, которым авторизация нужна - users и cards

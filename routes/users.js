@@ -12,13 +12,13 @@ const {
 
 router.get('/', getUsers);
 
-router.get('/:userId', getUserById);
-
 router.get('/me', getCurrentUserInfo);
 
-router.post('/signin', login);
+router.get('/:userId', getUserById);
 
-router.post('/signup', createUser);
+router.post('/', login);
+
+router.post('/', createUser);
 
 router.patch('/me', updateProfile);
 

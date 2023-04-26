@@ -51,31 +51,31 @@ const getUserById = (req, res) => {
 };
 
 const getCurrentUserInfo = (req, res) => {
-  console.log(req);
-  // const userId = req._id;
+  console.log(req.user);
+  const userId = req._id;
 
-  // User.findById(userId)
-  //   .orFail()
-  //   .then((user) => {
-  //     res.send(user);
-  //   })
-  //   .catch((err) => {
-  //     if (err instanceof DocumentNotFoundError) {
-  //       res.status(NOT_FOUND_ERROR_CODE).send({
-  //         message: 'Пользователь по указанному _id не найден',
-  //       });
-  //       return;
-  //     }
-  //     if (err instanceof CastError) {
-  //       res
-  //         .status(BAD_REQUEST_ERROR_CODE)
-  //         .send({ message: 'Передан некорректный ID пользователя' });
-  //     } else {
-  //       res
-  //         .status(INTERNAL_SERVER_ERROR_CODE)
-  //         .send({ message: `Произошла ошибка: ${err.name} ${err.message}` });
-  //     }
-  //   });
+  User.findById(userId)
+    .orFail()
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err instanceof DocumentNotFoundError) {
+        res.status(NOT_FOUND_ERROR_CODE).send({
+          message: 'Пользователь по указанному _id не найден',
+        });
+        return;
+      }
+      if (err instanceof CastError) {
+        res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: 'Передан некорректный ID пользователя' });
+      } else {
+        res
+          .status(INTERNAL_SERVER_ERROR_CODE)
+          .send({ message: `Произошла ошибка: ${err.name} ${err.message}` });
+      }
+    });
 };
 
 // Функция, которая создаёт пользователя
@@ -112,12 +112,11 @@ const createUser = (req, res) => {
 };
 
 const login = (req, res) => {
-  // console.log(req.body);
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      // console.log(user._id);
+      console.log(user._id);
       // создадим токен
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       // отправим токен, браузер сохранит его в куках
@@ -125,7 +124,9 @@ const login = (req, res) => {
         // token - наш JWT токен, который мы отправляем
         maxAge: 3600000,
         httpOnly: true,
-      })
+      });
+      // отправим токен пользователю
+      res.send({ token })
         .end(); // если у ответа нет тела, можно использовать метод end
     })
     .catch((err) => {
