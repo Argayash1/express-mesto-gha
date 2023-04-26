@@ -1,5 +1,6 @@
 const mongoose = require('mongoose'); // импортируем mongoose
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
+const isEmail = require('validator/lib/isEmail');
 
 const userSchema = new mongoose.Schema(
   {
@@ -7,6 +8,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: [true, 'передан e-mail, который уже есть в базе'],
+      validate: {
+        validator(v) { // validator - функция проверки данных. v - значение свойства e-mail
+          return isEmail(v); // если возраст меньше 18, вернётся false
+        },
+        message: 'Вам должно быть больше 18 лет!', // когда validator вернёт false, будет использовано это сообщение
+      },
     },
     password: {
       type: String,
