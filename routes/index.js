@@ -12,7 +12,7 @@ router.post('/signup', createUser);
 router.post('/signin', login);
 
 // авторизация
-// router.use(auth);
+router.use(auth);
 
 // роуты, которым авторизация нужна - users и cards
 router.use('/users', users); // добавили роутеры для пользователей

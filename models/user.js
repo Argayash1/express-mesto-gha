@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 8,
+      select: false,
     },
     name: {
       // у пользователя есть имя — опишем требования к имени в схеме:
@@ -46,7 +47,7 @@ const userSchema = new mongoose.Schema(
 // eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
 // попытаемся найти пользователя по почте
-  return this.findOne({ email }) // this — это модель User
+  return this.findOne({ email }).select('+password') // this — это модель User
     .then((user) => {
       // не нашёлся — отклоняем промис
       if (!user) {

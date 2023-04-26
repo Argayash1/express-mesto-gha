@@ -51,8 +51,7 @@ const getUserById = (req, res) => {
 };
 
 const getCurrentUserInfo = (req, res) => {
-  console.log(req.user);
-  const userId = req._id;
+  const userId = req.user._id;
 
   User.findById(userId)
     .orFail()
@@ -116,7 +115,6 @@ const login = (req, res) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      console.log(user._id);
       // создадим токен
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       // отправим токен, браузер сохранит его в куках
@@ -139,7 +137,6 @@ const login = (req, res) => {
 
 // Функция-декоратор, которая обновляет данные пользователя
 const updateUserData = (req, res, updateOptions) => {
-  console.log(req.user);
   const { _id: userId } = req.user;
   // обновим имя найденного по _id пользователя
   User.findByIdAndUpdate(

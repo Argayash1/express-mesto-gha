@@ -50,9 +50,16 @@ const createCard = (req, res) => {
 // Функция, которая удаляет карточку по идентификатору
 const deleteCardById = (req, res) => {
   const { cardId } = req.params;
+  const { _id: userId } = req.user;
+
   Card.findByIdAndRemove(cardId)
     .orFail()
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (userId !== card.owner._id) {
+        res.status(BAD_REQUEST_ERROR_CODE).send({ message: 'К сожалению, Вы не можете удалить эту карточку' });
+      }
+      res.send(card);
+    })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
         res.status(NOT_FOUND_ERROR_CODE).send({
