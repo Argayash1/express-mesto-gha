@@ -1,27 +1,61 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); // импортируем mongoose
+const bcrypt = require('bcryptjs'); // импортируем bcrypt
 
 const userSchema = new mongoose.Schema(
   {
+    email: {
+      type: String,
+      required: true,
+      unique: [true, 'передан e-mail, который уже есть в базе'],
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 8,
+    },
     name: {
       // у пользователя есть имя — опишем требования к имени в схеме:
       type: String, // имя — это строка
-      required: [true, 'не передано имя пользователя'], // оно должно быть у каждого пользователя, так что имя — обязательное поле
       minlength: [2, 'длина имени пользователя должна быть не менее 2 символов'], // минимальная длина имени — 2 символа
       maxlength: [30, 'длина имени пользователя должна быть не более 30 символов'], // а максимальная — 30 символов
+      default: 'Жак-Ив Кусто',
     },
     about: {
       type: String, // информация о себе — это строка
-      required: [true, 'не передана информация о себе'], // оно должно быть у каждого пользователя, так что о себе — обязательное поле
       minlength: [2, 'длина информации о себе должна быть не менее 2 символов'], // минимальная длина имени — 2 символа
       maxlength: [30, 'длина информации о себе должна быть не более 30 символов'], // а максимальная — 30 символов
+      default: 'Исследователь',
     },
     avatar: {
       type: String, // ссылка — это строка
-      required: [true, 'не передана ссылка на аватар пользователя'],
+      default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     },
   },
   { versionKey: false }, // отключаем поле "__v"
 );
+
+// добавим метод findUserByCredentials схеме пользователя
+// у него будет два параметра — почта и пароль
+// eslint-disable-next-line func-names
+userSchema.statics.findUserByCredentials = function (email, password) {
+// попытаемся найти пользователя по почте
+  return this.findOne({ email }) // this — это модель User
+    .then((user) => {
+      // не нашёлся — отклоняем промис
+      if (!user) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+
+      // нашёлся — сравниваем хеши
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new Error('Неправильные почта или пароль'));
+          }
+          return user; // теперь user доступен
+        });
+    });
+};
 
 // создаём модель и экспортируем её
 module.exports = mongoose.model('user', userSchema);
