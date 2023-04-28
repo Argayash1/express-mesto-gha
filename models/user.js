@@ -1,6 +1,7 @@
 const mongoose = require('mongoose'); // импортируем mongoose
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
 const isEmail = require('validator/lib/isEmail');
+const isUrl = require('validator/lib/isURL');
 
 const userSchema = new mongoose.Schema(
   {
@@ -9,9 +10,9 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: [true, 'передан e-mail, который уже есть в базе'],
       validate: {
-        validator(v) { // validator - функция проверки данных. v - значение свойства e-mail
-          return isEmail(v); // если адрес e-mail не будет соответствовать формату, вернётся false
-        },
+        // validator - функция проверки данных. v - значение свойства e-mail
+        // если адрес e-mail не будет соответствовать формату, вернётся false
+        validator: (email) => isEmail(email),
         message: 'e-mail не соответствует формату адреса электронной почты', // когда validator вернёт false, будет использовано это сообщение
       },
     },
@@ -36,6 +37,13 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String, // ссылка — это строка
+      validate: {
+        // validator - функция проверки данных. avatar - значение свойства avatar,
+        // его можно обозначить как угодно, главное, чтобы совпадали обозначения в скобках
+        // если avatar не соответствует формату, вернётся false
+        validator: (avatar) => isUrl(avatar, { protocols: ['http', 'https'], require_protocol: true }),
+        message: 'ссылка не соответствует формату', // когда validator вернёт false, будет использовано это сообщение
+      },
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     },
   },
