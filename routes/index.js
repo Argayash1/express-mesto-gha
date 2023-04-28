@@ -1,6 +1,7 @@
 const router = require('express').Router(); // импортируем роутер из express
 const { celebrate, Joi } = require('celebrate');
 const auth = require('../middlewares/auth');
+const { regex } = require('../utils/constants');
 
 const { NOT_FOUND_ERROR_CODE } = require('../utils/constants');
 
@@ -13,6 +14,9 @@ router.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+    avatar: Joi.string().required().regex(regex),
   }),
 }), createUser); // добавили роутер для регистрации
 
