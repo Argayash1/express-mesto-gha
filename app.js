@@ -18,7 +18,9 @@ app.use(express.json()); // для собирания JSON-формата
 app.use(express.urlencoded({ extended: true }));
 
 app.use(router);
-app.use(errors);
+
+// обработчики ошибок
+app.use(errors()); // обработчик ошибок celebrate
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
