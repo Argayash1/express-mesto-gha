@@ -1,6 +1,7 @@
 const express = require('express');
 
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const router = require('./routes/index');
 
 // Слушаем 3000 порт
@@ -17,6 +18,7 @@ app.use(express.json()); // для собирания JSON-формата
 app.use(express.urlencoded({ extended: true }));
 
 app.use(router);
+app.use(errors);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
