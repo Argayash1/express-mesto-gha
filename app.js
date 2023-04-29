@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const router = require('./routes/index');
+const errorHandler = require('./middlewares/errorHandler');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -17,10 +18,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 app.use(express.json()); // для собирания JSON-формата
 app.use(express.urlencoded({ extended: true }));
 
+// роутер
 app.use(router);
 
 // обработчики ошибок
 app.use(errors()); // обработчик ошибок celebrate
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
