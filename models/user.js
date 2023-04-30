@@ -48,7 +48,8 @@ const userSchema = new mongoose.Schema(
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     },
   },
-  { versionKey: false }, // отключаем поле "__v"
+  // делаем, чтобы пароль не отправлялся при регистрации и отключаем поле "__v"
+  { toJSON: { useProjection: true }, toObject: { useProjection: true }, versionKey: false },
 );
 
 // добавим метод findUserByCredentials схеме пользователя
