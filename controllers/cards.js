@@ -4,7 +4,7 @@ const { CastError, ValidationError } = require('mongoose').Error;
 // Импорт классов ошибок из конструкторов ошибок
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
-const ConflictError = require('../errors/ConflictError');
+const ForbiddenError = require('../errors/ConflictError');
 
 // Импорт модели user
 const Card = require('../models/card');
@@ -53,7 +53,7 @@ const deleteCardById = (req, res, next) => {
         throw new NotFoundError('Карточка с указанным _id не найдена');
       }
       if (userId !== card.owner.toString()) {
-        throw new ConflictError('К сожалению, Вы не можете удалить эту карточку');
+        throw new ForbiddenError('К сожалению, Вы не можете удалить эту карточку');
       }
       return Card.findByIdAndRemove(cardId)
         .then(() => res.send({ message: 'Пост удалён' }));

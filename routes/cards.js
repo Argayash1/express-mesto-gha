@@ -22,12 +22,12 @@ router.post('/', celebrate({
 
 router.delete(
   '/:cardId',
-  // celebrate({
-  // // валидируем параметры
-  //   params: Joi.object().keys({
-  //     cardId: Joi.string().hex().length(24).required(),
-  //   }),
-  // }),
+  celebrate({
+  // валидируем параметры
+    params: Joi.object().keys({
+      cardId: Joi.string().hex().length(24).required(),
+    }),
+  }),
   deleteCardById,
 );
 
