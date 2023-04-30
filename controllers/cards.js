@@ -4,7 +4,7 @@ const { CastError, ValidationError } = require('mongoose').Error;
 // Импорт классов ошибок из конструкторов ошибок
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
-const ForbiddenError = require('../errors/ConflictError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 // Импорт модели user
 const Card = require('../models/card');
