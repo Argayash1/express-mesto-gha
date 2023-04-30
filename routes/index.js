@@ -1,9 +1,9 @@
 const router = require('express').Router(); // импортируем роутер из express
 const { celebrate, Joi } = require('celebrate');
 const auth = require('../middlewares/auth');
-const { regex } = require('../utils/constants');
+const { regEx } = require('../utils/constants');
 
-const { NOT_FOUND_ERROR_CODE } = require('../utils/constants');
+const { NOT_FOUND_404 } = require('../utils/constants');
 
 const users = require('./users'); // импортируем роутер users.js
 const cards = require('./cards'); // импортируем роутер cards.js
@@ -16,7 +16,7 @@ router.post('/signup', celebrate({
     password: Joi.string().required().min(8),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(regex),
+    avatar: Joi.string().regex(regEx),
   }),
 }), createUser); // добавили роутер для регистрации
 
@@ -32,7 +32,7 @@ router.use('/users', auth, users); // добавили роутеры для п�
 router.use('/cards', auth, cards); // добавили роутеры для карточек
 
 router.use('*', (req, res) => {
-  res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Запрашиваемый URL не существует' });
+  res.status(NOT_FOUND_404).send({ message: 'Запрашиваемый URL не существует' });
 });
 
 module.exports = router; // экспортировали этот роутер

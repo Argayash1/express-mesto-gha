@@ -1,84 +1,58 @@
-const { DocumentNotFoundError, CastError, ValidationError } = require('mongoose').Error;
+// Импорт классов ошибок из mongoose.Error
+const { CastError, ValidationError } = require('mongoose').Error;
 
+// Импорт модулей bcryptjs и jsonwebtoken
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
 const jwt = require('jsonwebtoken'); // импортируем модуль jsonwebtoken
+
+// Импорт классов ошибок из конструкторов ошибок
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
+const ConflictError = require('../errors/ConflictError');
+
+// Импорт модели user
 const User = require('../models/user'); // импортируем модель user
 
-const {
-  CREATED_CODE,
-  BAD_REQUEST_ERROR_CODE,
-  NOT_FOUND_ERROR_CODE,
-  INTERNAL_SERVER_ERROR_CODE,
-} = require('../utils/constants');
+// Импорт статус-кодов ошибок
+const { CREATED_201 } = require('../utils/constants');
 
 // Функция, которая возвращает всех пользователей
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => {
-      res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: `Произошла ошибка: ${err.name} ${err.message}` });
-    });
+    .catch(next); // добавили catch, такая запись эквивалентна следующей: .catch(err => next(err));
 };
 
 // Функция, которая возвращает пользователя по _id
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
-    .orFail()
     .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь по указанному _id не найден');
+      }
       res.send(user);
     })
     .catch((err) => {
-      if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND_ERROR_CODE).send({
-          message: 'Пользователь по указанному _id не найден',
-        });
-        return;
-      }
       if (err instanceof CastError) {
-        res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: 'Передан некорректный ID пользователя' });
+        next(new BadRequestError('Передан некорректный ID пользователя'));
       } else {
-        res
-          .status(INTERNAL_SERVER_ERROR_CODE)
-          .send({ message: `Произошла ошибка: ${err.name} ${err.message}` });
+        next(err);
       }
     });
 };
 
-const getCurrentUserInfo = (req, res) => {
+const getCurrentUserInfo = (req, res, next) => {
   const userId = req.user._id;
 
   User.findById(userId)
-    .orFail()
-    .then((user) => {
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND_ERROR_CODE).send({
-          message: 'Пользователь по указанному _id не найден',
-        });
-        return;
-      }
-      if (err instanceof CastError) {
-        res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: 'Передан некорректный ID пользователя' });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR_CODE)
-          .send({ message: `Произошла ошибка: ${err.name} ${err.message}` });
-      }
-    });
+    .then((user) => res.send(user))
+    .catch(next);
 };
 
 // Функция, которая создаёт пользователя
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -92,25 +66,25 @@ const createUser = (req, res) => {
       password: hash, // записываем хеш в базу
     }))
     // вернём записанные в базу данные
-    .then((user) => res.status(CREATED_CODE).send(user))
+    .then((user) => res.status(CREATED_201).send(user))
     // данные не записались, вернём ошибку
     .catch((err) => {
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким e-mail уже существует'));
+        return;
+      }
       if (err instanceof ValidationError) {
         const errorMessage = Object.values(err.errors)
           .map((error) => error.message)
-          .join(' ');
-        res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: `Переданы некорректные данные при создании пользователя: ${errorMessage}`,
-        });
+          .join(', ');
+        next(new BadRequestError(`Переданы некорректные данные при создании пользователя: ${errorMessage}`));
       } else {
-        res
-          .status(INTERNAL_SERVER_ERROR_CODE)
-          .send({ message: `Произошла ошибка: ${err.name} ${err.message}` });
+        next(err);
       }
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -122,21 +96,26 @@ const login = (req, res) => {
         // token - наш JWT токен, который мы отправляем
         maxAge: 3600000,
         httpOnly: true,
-      });
+      })
       // отправим токен пользователю
-      res.send({ token })
-        .end(); // если у ответа нет тела, можно использовать метод end
+        .send({ token });
+      // .end(); // если у ответа нет тела, можно использовать метод end
     })
     .catch((err) => {
       // ошибка аутентификации
-      res
-        .status(401)
-        .send({ message: err.message });
+      if (err instanceof ValidationError) {
+        const errorMessage = Object.values(err.errors)
+          .map((error) => error.message)
+          .join(', ');
+        next(new BadRequestError(`Переданы некорректные данные при создании пользователя: ${errorMessage}`));
+      } else {
+        next(err);
+      }
     });
 };
 
 // Функция-декоратор, которая обновляет данные пользователя
-const updateUserData = (req, res, updateOptions) => {
+const updateUserData = (req, res, next, updateOptions) => {
   const { _id: userId } = req.user;
   // обновим имя найденного по _id пользователя
   User.findByIdAndUpdate(
@@ -147,46 +126,38 @@ const updateUserData = (req, res, updateOptions) => {
       runValidators: true, // данные будут валидированы перед изменением
     },
   )
-    .orFail()
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND_ERROR_CODE).send({
-          message: 'Пользователь по указанному _id не найден',
-        });
-        return;
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь по указанному _id не найден');
       }
+      res.send(user);
+    })
+    .catch((err) => {
       if (err instanceof ValidationError) {
         const errorMessage = Object.values(err.errors)
           .map((error) => error.message)
           .join(', ');
-        res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: `Переданы некорректные данные при обновлении профиля: ${errorMessage}`,
-        });
+        next(new BadRequestError(`Переданы некорректные данные при создании пользователя: ${errorMessage}`));
         return;
       }
       if (err instanceof CastError) {
-        res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: 'Передан некорректный ID пользователя' });
+        next(new BadRequestError('Передан некорректный ID пользователя'));
       } else {
-        res
-          .status(INTERNAL_SERVER_ERROR_CODE)
-          .send({ message: `Произошла ошибка: ${err.name} ${err.message}` });
+        next(err);
       }
     });
 };
 
 // Функция-декоратор, которая обновляет профиль пользователя
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const updateOptions = req.body;
-  updateUserData(req, res, updateOptions);
+  updateUserData(req, res, next, updateOptions);
 };
 
 // Функция-декоратор, которая обновляет аватар пользователя
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const updateOptions = req.body;
-  updateUserData(req, res, updateOptions);
+  updateUserData(req, res, next, updateOptions);
 };
 
 module.exports = {

@@ -2,13 +2,14 @@ const mongoose = require('mongoose'); // импортируем mongoose
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
 const isEmail = require('validator/lib/isEmail');
 const isUrl = require('validator/lib/isURL');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
       required: true,
-      unique: [true, 'передан e-mail, который уже есть в базе'],
+      unique: true,
       validate: {
         // validator - функция проверки данных. v - значение свойства e-mail
         // если адрес e-mail не будет соответствовать формату, вернётся false
@@ -59,14 +60,16 @@ userSchema.statics.findUserByCredentials = function (email, password) {
     .then((user) => {
       // не нашёлся — отклоняем промис
       if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        throw new UnauthorizedError('Неправильные почта или пароль');
+        // return Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
       }
 
       // нашёлся — сравниваем хеши
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            throw new UnauthorizedError('Неправильные почта или пароль');
+            // return Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
           }
           return user; // теперь user доступен
         });
