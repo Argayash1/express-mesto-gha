@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
 
+// Импорт переменной секретного ключа
+const { JWT_SECRET } = require('../utils/config');
+
 module.exports = (req, res, next) => {
   // извлечём токен и сохраняем его в переменную
   const token = req.cookies.jwt;
@@ -15,7 +18,7 @@ module.exports = (req, res, next) => {
 
   try {
     // попытаемся верифицировать токен
-    payload = jwt.verify(token, 'some-secret-key');
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     // отправим ошибку, если не получилось
     return res
