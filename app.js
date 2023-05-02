@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
