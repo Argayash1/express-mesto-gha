@@ -16,6 +16,9 @@ const User = require('../models/user'); // импортируем модель u
 // Импорт статус-кодов ошибок
 const { CREATED_201 } = require('../utils/constants');
 
+// Импорт переменной секретного ключа
+const { JWT_SECRET } = require('../utils/config');
+
 // Функция, которая возвращает всех пользователей
 const getUsers = (req, res, next) => {
   User.find({})
@@ -93,7 +96,7 @@ const login = (req, res, next) => {
   User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       // отправим токен, браузер сохранит его в куках
       res.cookie('jwt', token, {
         // token - наш JWT токен, который мы отправляем

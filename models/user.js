@@ -1,7 +1,12 @@
+// Импорт пакетов
 const mongoose = require('mongoose'); // импортируем mongoose
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
+
+// Импорт валидаторов
 const isEmail = require('validator/lib/isEmail');
 const isUrl = require('validator/lib/isURL');
+
+// Импорт классов ошибок
 const { ValidationError } = require('mongoose').Error;
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
@@ -9,18 +14,18 @@ const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: true,
+      required: [true, 'не передан e-mail пользователя'], // оно должно быть у каждого пользователя, так что e-mail — обязательное поле
       unique: true,
       validate: {
         // validator - функция проверки данных. v - значение свойства e-mail
         // если адрес e-mail не будет соответствовать формату, вернётся false
         validator: (email) => isEmail(email),
-        message: 'e-mail не соответствует формату адреса электронной почты', // когда validator вернёт false, будет использовано это сообщение
+        message: 'e-mail не соответствует формату', // когда validator вернёт false, будет использовано это сообщение
       },
     },
     password: {
       type: String,
-      required: true,
+      required: [true, 'не передан пароль пользователя'], // оно должно быть у каждого пользователя, так что пароль — обязательное поле
       minlength: 8,
       select: false,
     },
@@ -58,7 +63,10 @@ const userSchema = new mongoose.Schema(
 // eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
   const isEmailValid = isEmail(email);
+
+  // проверяем, валиден ли e-mail
   if (!isEmailValid) {
+    // не валиден - отклоняем промис
     return Promise.reject(new ValidationError());
   }
 

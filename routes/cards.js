@@ -1,9 +1,7 @@
+// Импорт роутера
 const router = require('express').Router();
-const {
-  cardDataValidator,
-  cardIdValidator,
-} = require('../middlewares/validators/cardValidator');
 
+// Импорт контроллеров
 const {
   getCards,
   createCard,
@@ -12,6 +10,13 @@ const {
   dislikeCard,
 } = require('../controllers/cards');
 
+// Импорт валидаторов
+const {
+  cardDataValidator,
+  cardIdValidator,
+} = require('../middlewares/validators/cardValidator');
+
+// Роутеры
 router.get('/', getCards);
 
 router.post('/', cardDataValidator, createCard);

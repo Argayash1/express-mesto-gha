@@ -1,4 +1,7 @@
+// Импорт пакетов
 const mongoose = require('mongoose');
+
+// Импорт валидатора URL
 const isUrl = require('validator/lib/isURL');
 
 const cardSchema = new mongoose.Schema(

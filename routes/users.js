@@ -1,10 +1,7 @@
+// Импорт роутера
 const router = require('express').Router();
-const {
-  userIdValidator,
-  userDataValidator,
-  userAvatarValidator,
-} = require('../middlewares/validators/userValidator');
 
+// Импорт контроллеров
 const {
   getUsers,
   getUserById,
@@ -13,6 +10,14 @@ const {
   updateAvatar,
 } = require('../controllers/users');
 
+// Импорт валидаторов
+const {
+  userIdValidator,
+  userDataValidator,
+  userAvatarValidator,
+} = require('../middlewares/validators/userValidator');
+
+// Роутеры
 router.get('/', getUsers);
 
 router.get('/me', getCurrentUserInfo);

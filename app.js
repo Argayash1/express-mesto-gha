@@ -1,48 +1,45 @@
+// Импорт модуля dotenv для добавления переменных окружения в process.env
 require('dotenv').config();
 
+// Импорт npm-пакетов
 const express = require('express');
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
-const cookieParser = require('cookie-parser');
-
 const mongoose = require('mongoose');
+
+// Импорт миддлвэров
+const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
-const router = require('./routes/index');
+const helmet = require('helmet');
 const errorHandler = require('./middlewares/errorHandler');
+const limiter = require('./middlewares/limiter');
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-});
+// Импорт роутера
+const router = require('./routes/index');
 
-// Слушаем 3000 порт
-const { PORT = 3000 } = process.env;
+// Импорт переменных
+const { PORT, DB } = require('./utils/config');
 
+// Создаём приложение на express
 const app = express(); // Cоздаём приложение методом express
 
 // подключаемся к серверу mongo
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+mongoose.connect(DB, {
   useNewUrlParser: true,
 });
 
-// Apply the rate limiting middleware to all requests
+// Миддлвэры для безопасности
 app.use(limiter);
 app.use(helmet());
 
+// Миддлвэры для парсинга
 app.use(express.json()); // для собирания JSON-формата
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // подключаем парсер кук как мидлвэр
 
-// роутер
+// Роутер
 app.use(router);
 
-// обработчики ошибок
+// Миддлвэры для обработки ошибок
 app.use(errors()); // обработчик ошибок celebrate
-app.use(errorHandler);
+app.use(errorHandler); // централизолванная обработка ошибок
 
-app.listen(PORT, () => {
-  // Если всё работает, консоль покажет, какой порт приложение слушает
-  console.log(`App listening on port ${PORT}`);
-});
+app.listen(PORT);
