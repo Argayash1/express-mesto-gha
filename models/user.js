@@ -2,6 +2,7 @@ const mongoose = require('mongoose'); // импортируем mongoose
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
 const isEmail = require('validator/lib/isEmail');
 const isUrl = require('validator/lib/isURL');
+const { ValidationError } = require('mongoose').Error;
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const userSchema = new mongoose.Schema(
@@ -56,21 +57,23 @@ const userSchema = new mongoose.Schema(
 // у него будет два параметра — почта и пароль
 // eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
-// попытаемся найти пользователя по почте
+  const isEmailValid = isEmail(email);
+  if (!isEmailValid) {
+    return Promise.reject(new ValidationError());
+  }
+
+  // попытаемся найти пользователя по почте
   return this.findOne({ email }).select('+password') // this — это модель User
     .then((user) => {
       // не нашёлся — отклоняем промис
       if (!user) {
-        throw new UnauthorizedError('Неправильные почта или пароль');
-        // return Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
+        return Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
       }
-
       // нашёлся — сравниваем хеши
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new UnauthorizedError('Неправильные почта или пароль');
-            // return Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
+            return Promise.reject(new UnauthorizedError('Неправильные почта или пароль'));
           }
           return user; // теперь user доступен
         });

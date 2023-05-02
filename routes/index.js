@@ -11,7 +11,7 @@ const { createUserValidator, loginValidator } = require('../middlewares/validato
 // роуты, не требующие авторизации - регистрация и логин
 router.post('/signup', createUserValidator, createUser); // добавили роутер для регистрации
 
-router.post('/signin', loginValidator, login); // добавили роутеры для авторизации
+router.post('/signin', login); // добавили роутеры для авторизации
 
 // роуты, которым авторизация нужна - users и cards
 router.use('/users', auth, users); // добавили роутеры для пользователей

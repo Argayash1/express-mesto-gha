@@ -87,7 +87,10 @@ const createUser = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  // User.findOne({ email }).select('+password')
+  //   .then((user1) => {
+  //     console.log(user1);
+  User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
@@ -96,6 +99,7 @@ const login = (req, res, next) => {
         // token - наш JWT токен, который мы отправляем
         maxAge: 3600000,
         httpOnly: true,
+        sameSite: true, // указали браузеру посылать куки, только если запрос с того же домена
       })
       // отправим токен пользователю
         .send({ token });
@@ -104,10 +108,7 @@ const login = (req, res, next) => {
     .catch((err) => {
       // ошибка аутентификации
       if (err instanceof ValidationError) {
-        const errorMessage = Object.values(err.errors)
-          .map((error) => error.message)
-          .join(', ');
-        next(new BadRequestError(`Переданы некорректные данные при создании пользователя: ${errorMessage}`));
+        next(new BadRequestError('Введённый e-mail не соответствует формату'));
       } else {
         next(err);
       }
@@ -137,7 +138,7 @@ const updateUserData = (req, res, next, updateOptions) => {
         const errorMessage = Object.values(err.errors)
           .map((error) => error.message)
           .join(', ');
-        next(new BadRequestError(`Переданы некорректные данные при создании пользователя: ${errorMessage}`));
+        next(new BadRequestError(`Переданы некорректные данные: ${errorMessage}`));
         return;
       }
       if (err instanceof CastError) {

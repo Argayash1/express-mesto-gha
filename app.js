@@ -1,6 +1,7 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
@@ -30,6 +31,7 @@ app.use(helmet());
 
 app.use(express.json()); // для собирания JSON-формата
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // подключаем парсер кук как мидлвэр
 
 // роутер
 app.use(router);
