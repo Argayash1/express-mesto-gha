@@ -70,6 +70,7 @@ const deleteCardById = (req, res, next) => {
 // Функция изменения статуса лайка карточки
 const changeLikeCardStatus = (req, res, next, likeOtpions) => {
   const { cardId } = req.params;
+
   Card.findById(cardId)
     .then((card) => {
       if (!card) {

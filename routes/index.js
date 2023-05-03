@@ -10,7 +10,7 @@ const auth = require('../middlewares/auth');
 const NotFoundError = require('../errors/NotFoundError');
 
 // Импорт контроллеров и валидаторов
-const { createUser, login } = require('../controllers/users');
+const { createUser, login, logout } = require('../controllers/users');
 const { createUserValidator, loginValidator } = require('../middlewares/validators/userValidator');
 
 // роуты, не требующие авторизации - регистрация и логин
@@ -20,9 +20,10 @@ router.post('/signin', loginValidator, login); // добавили роутер�
 // роуты, которым авторизация нужна - users и cards
 router.use('/users', auth, users); // добавили роутеры для пользователей
 router.use('/cards', auth, cards); // добавили роутеры для карточек
+router.get('/signout', auth, logout); // добавили роутер для выхода из системы (очищзения куки)
 
 // роут для запросов по несуществующим URL
-router.use('*', (req, res, next) => {
+router.use('*', auth, (req, res, next) => {
   next(new NotFoundError('Запрашиваемый URL не существует'));
 });
 

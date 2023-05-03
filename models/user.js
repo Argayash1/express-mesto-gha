@@ -7,7 +7,6 @@ const isEmail = require('validator/lib/isEmail');
 const isUrl = require('validator/lib/isURL');
 
 // Импорт классов ошибок
-const { ValidationError } = require('mongoose').Error;
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const userSchema = new mongoose.Schema(
@@ -62,14 +61,6 @@ const userSchema = new mongoose.Schema(
 // у него будет два параметра — почта и пароль
 // eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
-  const isEmailValid = isEmail(email);
-
-  // проверяем, валиден ли e-mail
-  if (!isEmailValid) {
-    // не валиден - отклоняем промис
-    return Promise.reject(new ValidationError());
-  }
-
   // попытаемся найти пользователя по почте
   return this.findOne({ email }).select('+password') // this — это модель User
     .then((user) => {
