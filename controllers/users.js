@@ -54,7 +54,7 @@ const getCurrentUserInfo = (req, res, next) => {
     .catch(next);
 };
 
-// Функция, которая создаёт пользователя
+// Функция (контроллер) регистрации, которая создаёт пользователя
 const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
@@ -87,6 +87,7 @@ const createUser = (req, res, next) => {
     });
 };
 
+// Функция (контроллер) аутентификации
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
