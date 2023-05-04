@@ -91,9 +91,6 @@ const createUser = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  // User.findOne({ email }).select('+password')
-  //   .then((user1) => {
-  //     console.log(user1);
   User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
