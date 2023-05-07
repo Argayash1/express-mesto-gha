@@ -11,6 +11,7 @@ const { errors } = require('celebrate');
 const helmet = require('helmet');
 const errorHandler = require('./middlewares/errorHandler');
 const limiter = require('./middlewares/limiter');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 // Импорт роутера
 const router = require('./routes/index');
@@ -35,10 +36,14 @@ app.use(express.json()); // для собирания JSON-формата
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // подключаем парсер кук как мидлвэр
 
+// Миддлвэр-логгер запросов
+app.use(requestLogger); // подключаем логгер запросов
+
 // Роутер
 app.use(router);
 
 // Миддлвэры для обработки ошибок
+app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors()); // обработчик ошибок celebrate
 app.use(errorHandler); // централизолванная обработка ошибок
 
