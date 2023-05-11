@@ -69,7 +69,7 @@ const createUser = (req, res, next) => {
       password: hash, // записываем хеш в базу
     }))
     // вернём записанные в базу данные
-    .then((user) => res.status(CREATED_201).send({ data: { _id: user._id, email: user.email } }))
+    .then((user) => res.status(CREATED_201).send({ data: user }))
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.code === 11000) {
